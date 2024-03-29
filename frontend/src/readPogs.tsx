@@ -1,18 +1,8 @@
-import React, { useEffect } from 'react';
-import { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 
-interface Pog {
-  id: number;
-  name: string;
-  ticker_symbol: string;
-  price: number;
-  color: string;
-}
-
-const ReadPogs: React.FC = () => {
-  const history = useHistory();
-  const [pogs, setPogs] = useState<Pog[]>([]);
+const PogsList: React.FC = () => {
+  const [pogs, setPogs] = useState<{ id: number; name: string; ticker_symbol: string; price: number; color: string }[]>([]);
+  const [editingPog, setEditingPog] = useState<{ id: number; name: string; ticker_symbol: string; price: number; color: string } | null>(null);
 
   useEffect(() => {
     getPogs();
@@ -31,29 +21,131 @@ const ReadPogs: React.FC = () => {
     }
   };
 
+  const handleUpdatePog = async (updatedPog: { id: number; name: string; ticker_symbol: string; price: number; color: string }) => {
+    try {
+      const response = await fetch(`/pogs/${updatedPog.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedPog),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update Pog');
+      }
+      setEditingPog(null);
+      getPogs();
+    } catch (error) {
+      console.error('Error updating Pog:', error);
+    }
+  };
+
+  const handleDeletePog = async (pogId: number) => {
+    try {
+      const response = await fetch(`/pogs/${pogId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete Pog');
+      }
+      getPogs();
+    } catch (error) {
+      console.error('Error deleting Pog:', error);
+    }
+  };
+
   const handleBackToHome = () => {
-    history.push('/');
+    window.location.href = 'index.html';
   };
 
   return (
     <div className="container mx-auto p-4">
       <button
         type="button"
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
         onClick={handleBackToHome}
-        className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300"
       >
         Back
       </button>
       <h1 className="text-2xl font-bold mb-4">List of Pogs</h1>
-      <div id="pogsList">
+      <div className="grid grid-cols-1 gap-4">
         {pogs.map((pog) => (
-          <div key={pog.id} className="mb-4 border rounded p-4">
-            <p className="mb-2"><strong>Name:</strong> {pog.name}</p>
-            <p className="mb-2"><strong>Ticker Symbol:</strong> {pog.ticker_symbol}</p>
-            <p className="mb-2"><strong>Price:</strong> {pog.price}</p>
-            <p className="mb-2"><strong>Color:</strong> {pog.color}</p>
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-blue-600 transition duration-300">Update</button>
-            <button className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">Delete</button>
+          <div key={pog.id} className="bg-white shadow-md rounded-lg p-4">
+            {editingPog && editingPog.id === pog.id ? (
+              <>
+                <input
+                  type="text"
+                  className="mb-2 border border-gray-300 rounded px-2 py-1"
+                  value={editingPog.name}
+                  onChange={(e) => setEditingPog({ ...editingPog, name: e.target.value })}
+                />
+                <input
+                  type="text"
+                  className="mb-2 border border-gray-300 rounded px-2 py-1"
+                  value={editingPog.ticker_symbol}
+                  onChange={(e) => setEditingPog({ ...editingPog, ticker_symbol: e.target.value })}
+                />
+                <input
+                  type="number"
+                  className="mb-2 border border-gray-300 rounded px-2 py-1"
+                  value={editingPog.price}
+                  onChange={(e) => setEditingPog({ ...editingPog, price: parseFloat(e.target.value) })}
+                />
+                <input
+                  type="text"
+                  className="mb-2 border border-gray-300 rounded px-2 py-1"
+                  value={editingPog.color}
+                  onChange={(e) => setEditingPog({ ...editingPog, color: e.target.value })}
+                />
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2"
+                    onClick={() => handleUpdatePog(editingPog)}
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                    onClick={() => setEditingPog(null)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p>
+                  <strong>Name:</strong> {pog.name}
+                </p>
+                <p>
+                  <strong>Ticker Symbol:</strong> {pog.ticker_symbol}
+                </p>
+                <p>
+                  <strong>Price:</strong> {pog.price}
+                </p>
+                <p>
+                  <strong>Color:</strong> {pog.color}
+                </p>
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+                    onClick={() => setEditingPog(pog)}
+                  >
+                    Update
+                  </button>
+                  <button
+                    type="button"
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                    onClick={() => handleDeletePog(pog.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         ))}
       </div>
@@ -61,4 +153,4 @@ const ReadPogs: React.FC = () => {
   );
 };
 
-export default ReadPogs;
+export default PogsList;

@@ -1,11 +1,11 @@
 import React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 const PogsForm: React.FC = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
-
     const formData = new FormData(event.target as HTMLFormElement)
     const formObject: { [key: string]: string } = {}
     formData.forEach((value, key) => {
@@ -16,13 +16,13 @@ const PogsForm: React.FC = () => {
       const response = await fetch('http://localhost:3000/Pogs', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formObject)
+        body: JSON.stringify(formObject),
       })
 
       if (response.ok) {
-        window.location.href = 'readPogs.tsx' // Redirect after successful form submission
+        navigate('/readPogs') // Redirect after successful form submission
       } else {
         console.error('Error submitting form:', response.statusText)
       }
@@ -30,8 +30,9 @@ const PogsForm: React.FC = () => {
       console.error('Error submitting form:', error)
     }
   }
+
   const handleViewPogsClick = () => {
-    history.push('/readPogs')
+    navigate('/readPogs')
   }
 
   return (
