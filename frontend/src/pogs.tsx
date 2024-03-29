@@ -13,7 +13,7 @@ const PogsForm: React.FC = () => {
     })
 
     try {
-      const response = await fetch('http://localhost:3000/Pogs', {
+      const response = await fetch('http://localhost:3000/pogs', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

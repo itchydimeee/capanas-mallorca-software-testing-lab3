@@ -1,14 +1,17 @@
 import express from "express";
 import { pool } from "./db";
-import dotenv from 'dotenv'
+import dotenv from 'dotenv';
+import cors from 'cors'; // Import the cors package
 
 export const app = express();
 
 async function startServer() {
-  dotenv.config()
+  dotenv.config();
+  app.use(cors()); // Enable CORS for all routes
+
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
-  
+
   app
     .post("/pogs", async (request, response) => {
       try {
@@ -31,10 +34,9 @@ async function startServer() {
         response.status(200).json(result.rows);
       } catch (err) {
         console.log("error", err);
-        response.status(404).send("Not  Found");
+        response.status(404).send("Not Found");
       }
     })
-
     .get("/pogs/:id", async (request, response) => {
       try {
         const id = request.params.id;
@@ -49,7 +51,6 @@ async function startServer() {
         response.status(404).send("Not found");
       }
     })
-
     .put("/pogs/:id", async (request, response) => {
       try {
         const { name, ticker_symbol, price, color } = request.body;
@@ -77,9 +78,10 @@ async function startServer() {
         response.status(404).send("Not found");
       }
     })
-    .use(express.static("frontend"))
+    .use(express.static("src"))
     .listen(3000, () => {
       console.log("server started at http://localhost:3000");
     });
 }
+
 startServer();
