@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'
 
 const PogsList: React.FC = () => {
   const [pogs, setPogs] = useState<{ id: number; name: string; ticker_symbol: string; price: number; color: string }[]>([]);
   const [editingPog, setEditingPog] = useState<{ id: number; name: string; ticker_symbol: string; price: number; color: string } | null>(null);
+  const navigate = useNavigate()
 
   useEffect(() => {
     getPogs();
@@ -55,7 +57,7 @@ const PogsList: React.FC = () => {
   };
 
   const handleBackToHome = () => {
-    window.location.href = 'index.html';
+    navigate('/')
   };
 
   return (
