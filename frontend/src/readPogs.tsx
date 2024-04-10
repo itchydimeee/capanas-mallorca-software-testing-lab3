@@ -2,8 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'
 
 const PogsList: React.FC = () => {
-  const [pogs, setPogs] = useState<{ id: number; name: string; ticker_symbol: string; price: number; color: string }[]>([]);
-  const [editingPog, setEditingPog] = useState<{ id: number; name: string; ticker_symbol: string; price: number; color: string } | null>(null);
+  const [pogs, setPogs] = useState<{
+    id: number;
+    name: string;
+    ticker_symbol: string;
+    price: number;
+    color: string
+  }[]>([]);
+
+  const [editingPog, setEditingPog] = useState<{
+    id: number; 
+    name: string;
+    ticker_symbol: string;
+    price: number;
+    color: string } | null
+    >
+    ();
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -12,7 +26,12 @@ const PogsList: React.FC = () => {
 
   const getPogs = async () => {
     try {
-      const response = await fetch('/pogs');
+      const response = await fetch('http://localhost:3000/pogs', { 
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       if (!response.ok) {
         throw new Error('Failed to fetch Pogs');
       }
@@ -24,8 +43,9 @@ const PogsList: React.FC = () => {
   };
 
   const handleUpdatePog = async (updatedPog: { id: number; name: string; ticker_symbol: string; price: number; color: string }) => {
+    
     try {
-      const response = await fetch(`/pogs/${updatedPog.id}`, {
+      const response = await fetch(`http://localhost:3000/pogs/${updatedPog.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
