@@ -1,5 +1,8 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import "tailwindcss/tailwind.css"
+
 
 const PogsForm: React.FC = () => {
   const navigate = useNavigate()
@@ -40,7 +43,7 @@ const PogsForm: React.FC = () => {
       <h1 className='text-2xl font-bold mb-4'>Create Pogs Form</h1>
       <form onSubmit={handleSubmit} className='space-y-4'>
         <div className='flex flex-col'>
-          <label htmlFor='name' className='text-sm font-semibold'>
+          <label htmlFor='name' className='text-sm font-bold'>
             Name:
           </label>
           <input

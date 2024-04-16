@@ -1,12 +1,12 @@
 import express from "express";
 import { pool } from "./db";
-import dotenv from 'dotenv';
+// import dotenv from 'dotenv';
 import cors from 'cors'; // Import the cors package
 
 export const app = express();
 
 async function startServer() {
-  dotenv.config();
+  // dotenv.config();
   app.use(cors()); // Enable CORS for all routes
 
   app.use(express.json());
