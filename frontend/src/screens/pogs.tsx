@@ -1,11 +1,12 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import useNavigation from '../components/navigation'
 import axios from 'axios'
 import "tailwindcss/tailwind.css"
 
 
+
 const PogsForm: React.FC = () => {
-  const navigate = useNavigate()
+  const { ToReadPogs } = useNavigation()
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -25,17 +26,14 @@ const PogsForm: React.FC = () => {
       })
 
       if (response.ok) {
-        navigate('/readPogs') // Redirect after successful form submission
+        alert('submission succesful') // Redirect after successful form submission
       } else {
         console.error('Error submitting form:', response.statusText)
+        alert('invalid submission')
       }
     } catch (error) {
       console.error('Error submitting form:', error)
     }
-  }
-
-  const handleViewPogsClick = () => {
-    navigate('/readPogs')
   }
 
   return (
@@ -95,7 +93,7 @@ const PogsForm: React.FC = () => {
           </button>
           <button
             type='button'
-            onClick={handleViewPogsClick}
+            onClick={ToReadPogs}
             className='bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition duration-300'
           >
             View Current Pogs
