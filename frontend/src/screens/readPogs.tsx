@@ -76,8 +76,8 @@ const PogsList: React.FC = () => {
     }
   };
 
-  const handleBackToHome = () => {
-    navigate('/')
+  const handleBackToPogs = () => {
+    navigate('/pogs')
   };
 
   return (
@@ -85,7 +85,7 @@ const PogsList: React.FC = () => {
       <button
         type="button"
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
-        onClick={handleBackToHome}
+        onClick={handleBackToPogs}
       >
         Back
       </button>
@@ -97,7 +97,7 @@ const PogsList: React.FC = () => {
               <>
                 <input
                   type="text"
-                  className="mb-2 border border-gray-300 rounded px-2 py-1"
+                  className="mb-2 mr-5 border border-gray-300 rounded px-2 py-1"
                   value={editingPog.name}
                   onChange={(e) => setEditingPog({ ...editingPog, name: e.target.value })}
                 />
@@ -109,7 +109,7 @@ const PogsList: React.FC = () => {
                 />
                 <input
                   type="number"
-                  className="mb-2 border border-gray-300 rounded px-2 py-1"
+                  className="mb-2 mr-5 border border-gray-300 rounded px-2 py-1"
                   value={editingPog.price}
                   onChange={(e) => setEditingPog({ ...editingPog, price: parseFloat(e.target.value) })}
                 />
