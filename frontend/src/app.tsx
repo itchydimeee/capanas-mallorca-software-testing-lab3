@@ -6,6 +6,7 @@ import NewPage from './screens/newPage';
 import RenderPogs from './screens/renderPogs';
 import LoginForm from './screens/login';
 import SignupForm from './screens/signup';
+import UserPage from './screens/user';
 
 const App: React.FC = () => {
   return (
@@ -17,6 +18,7 @@ const App: React.FC = () => {
         <Route path="/readPogs" element={<PogsList />} />
         <Route path="/test-pogs" element={<NewPage />} />
         <Route path="/render-pogs" element={<RenderPogs />} />
+        <Route path="/user" element={<UserPage />} />
       </Routes>
     </Router>
   );
