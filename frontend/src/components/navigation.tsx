@@ -7,7 +7,7 @@ function useNavigation () {
     navigate(path);
   }
 
-  function ToUserPogs() {
+  function ToCreatePogs() {
     navigateTo('/pogs');
   }
 
@@ -24,7 +24,7 @@ function useNavigation () {
   }
 
   return {
-    ToUserPogs,
+    ToCreatePogs,
     ToLogin,
     ToSignUp,
     ToReadPogs

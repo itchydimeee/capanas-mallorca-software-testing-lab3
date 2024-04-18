@@ -1,16 +1,16 @@
 import React from 'react'
 import useNavigation from '../components/navigation'
-import axios from 'axios'
-import "tailwindcss/tailwind.css"
-
-
+import 'tailwindcss/tailwind.css'
+import { useAuth0 } from '@auth0/auth0-react';
 
 const PogsForm: React.FC = () => {
   const { ToReadPogs } = useNavigation()
+  const { loginWithRedirect, logout } = useAuth0();
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const formData = new FormData(event.target as HTMLFormElement)
+
+    const formData = new FormData(event.currentTarget)
     const formObject: { [key: string]: string } = {}
     formData.forEach((value, key) => {
       formObject[key] = value.toString()
@@ -20,9 +20,9 @@ const PogsForm: React.FC = () => {
       const response = await fetch('http://localhost:3000/pogs', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formObject),
+        body: JSON.stringify(formObject)
       })
 
       if (response.ok) {
@@ -34,6 +34,14 @@ const PogsForm: React.FC = () => {
     } catch (error) {
       console.error('Error submitting form:', error)
     }
+  }
+  const handleLogout = async () => {
+    await logout({
+      logoutParams: {
+        returnTo: window.location.origin,
+      },
+    });
+
   }
 
   return (
@@ -100,6 +108,15 @@ const PogsForm: React.FC = () => {
           </button>
         </div>
       </form>
+      <div className='flex justify-end mt-4'>
+        <button
+          type='button'
+          className='bg-red-500 px-2 py-1 hover:bg-red-600 text-white rounded-lg'
+          onClick={handleLogout}
+        >
+          Logout
+        </button>
+      </div>
     </div>
   )
 }

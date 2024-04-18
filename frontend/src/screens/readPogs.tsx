@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'
+import useNavigation from '../components/navigation'
 
 const PogsList: React.FC = () => {
+  const { ToCreatePogs } = useNavigation()
   const [pogs, setPogs] = useState<{
     id: number;
     name: string;
@@ -18,7 +19,6 @@ const PogsList: React.FC = () => {
     color: string } | null
     >
     ();
-  const navigate = useNavigate()
 
   useEffect(() => {
     getPogs();
@@ -64,7 +64,7 @@ const PogsList: React.FC = () => {
 
   const handleDeletePog = async (pogId: number) => {
     try {
-      const response = await fetch(`/pogs/${pogId}`, {
+      const response = await fetch(`http://localhost:3000/pogs/${pogId}`, {
         method: 'DELETE',
       });
       if (!response.ok) {
@@ -76,16 +76,13 @@ const PogsList: React.FC = () => {
     }
   };
 
-  const handleBackToPogs = () => {
-    navigate('/pogs')
-  };
 
   return (
     <div className="container mx-auto p-4">
       <button
         type="button"
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
-        onClick={handleBackToPogs}
+        onClick={ToCreatePogs}
       >
         Back
       </button>
