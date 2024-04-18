@@ -15,19 +15,23 @@ function useNavigation () {
     navigateTo('/login');
   }
 
-  function ToSignUp() {
-    navigateTo('/signup');
+  function ToAdminLogin() {
+    navigateTo('/adminLogin');
   }
 
   function ToReadPogs() {
     navigateTo('/readPogs');
   }
+  function ToUserPage() {
+    navigateTo('/user')
+  }
 
   return {
     ToCreatePogs,
     ToLogin,
-    ToSignUp,
-    ToReadPogs
+    ToAdminLogin,
+    ToReadPogs,
+    ToUserPage
   };
 }
 
