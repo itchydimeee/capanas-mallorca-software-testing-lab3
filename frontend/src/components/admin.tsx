@@ -1,0 +1,1 @@
+export const adminEmails = ['acespiker07@gmail.com'];
