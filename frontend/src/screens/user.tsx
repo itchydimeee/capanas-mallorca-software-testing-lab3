@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
+import useNavigation from '../components/navigation'
 
 const UserPage: React.FC = () => {
   const { user, isAuthenticated, isLoading, logout } = useAuth0()
   const [pogs, setPogs] = useState([])
+  const {ToAdminLogin} = useNavigation()
 
   useEffect(() => {
     getPogs()
@@ -47,6 +49,13 @@ const UserPage: React.FC = () => {
             onClick={handleLogout}
           >
             Logout
+          </button>
+          <button
+            type="button"
+            onClick={ToAdminLogin}
+            className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-300"
+          >
+            Admin Login
           </button>
           {pogs.length > 0 ? (
             <div>

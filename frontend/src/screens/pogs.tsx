@@ -4,8 +4,8 @@ import 'tailwindcss/tailwind.css'
 import { useAuth0 } from '@auth0/auth0-react';
 
 const PogsForm: React.FC = () => {
-  const { ToReadPogs } = useNavigation()
-  const { loginWithRedirect, logout } = useAuth0();
+  const { ToReadPogs, ToUserPage } = useNavigation()
+  const { logout } = useAuth0();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -46,6 +46,8 @@ const PogsForm: React.FC = () => {
 
   return (
     <div className='container mx-auto p-4'>
+      <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4'
+      onClick={ToUserPage}>Back</button>
       <h1 className='text-2xl font-bold mb-4'>Create Pogs Form</h1>
       <form onSubmit={handleSubmit} className='space-y-4'>
         <div className='flex flex-col'>
