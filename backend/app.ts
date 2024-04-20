@@ -1,14 +1,11 @@
 import express from "express";
 import { pool } from "./db";
-// import dotenv from 'dotenv';
-import cors from 'cors'; // Import the cors package
+import cors from 'cors';
 
 export const app = express();
 
 async function startServer() {
-  // dotenv.config();
-  app.use(cors()); // Enable CORS for all routes
-
+  app.use(cors());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
@@ -76,6 +73,31 @@ async function startServer() {
       } catch (err) {
         console.log("error", err);
         response.status(404).send("Not found");
+      }
+    })
+    .post("/checkout", async (request, response) => {
+      try {
+        const cartIds  = request.body;
+        console.log('Received request body:' , request.body)
+        console.log('Received cartIds:', cartIds)
+        const connection = await pool.connect();
+
+        // Calculate the total price
+        const result = await connection.query(
+          "SELECT SUM(price) AS total_price FROM pogs WHERE id = ANY ($1::int[])",
+          [cartIds]
+        );
+        console.log('Query result:', result);
+        const { total_price } = result.rows[0];
+        console.log('total price:', total_price)
+
+        // Update the order status or perform any other necessary actions
+        // ...
+
+        response.status(200).json({ totalPrice: total_price });
+      } catch (err) {
+        console.log("error", err);
+        response.status(500).json({ error: "Failed to process checkout" });
       }
     })
     .use(express.static("src"))

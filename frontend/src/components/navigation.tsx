@@ -1,10 +1,18 @@
 import { useNavigate } from 'react-router-dom';
 
-function useNavigation () {
+interface Pog {
+  id: number;
+  name: string;
+  ticker_symbol: string;
+  price: number;
+  color: string;
+}
+
+function useNavigation(cart: Pog[] = []) {
   const navigate = useNavigate();
 
-  function navigateTo(path: string) {
-    navigate(path);
+  function navigateTo(path: string, state?: any) {
+    navigate(path, { state });
   }
 
   function ToCreatePogs() {
@@ -22,17 +30,16 @@ function useNavigation () {
   function ToReadPogs() {
     navigateTo('/readPogs');
   }
+
   function ToUserPage() {
-    navigateTo('/user')
+    navigateTo('/user');
   }
 
-  return {
-    ToCreatePogs,
-    ToLogin,
-    ToAdminLogin,
-    ToReadPogs,
-    ToUserPage
-  };
+  function toCheckout() {
+    navigateTo('/checkout', { state: { cart } });
+  }
+
+  return { ToCreatePogs, ToLogin, ToAdminLogin, ToReadPogs, ToUserPage, toCheckout };
 }
 
 export default useNavigation;
