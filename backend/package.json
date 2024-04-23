@@ -16,6 +16,8 @@
     "dotenv": "^16.4.5"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.17"
+    "@prisma/client": "^5.12.1",
+    "@types/cors": "^2.8.17",
+    "prisma": "^5.12.1"
   }
 }

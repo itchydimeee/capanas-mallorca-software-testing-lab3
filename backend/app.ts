@@ -1,6 +1,9 @@
 import express from "express";
 import { pool } from "./db";
+import { PrismaClient } from "@prisma/client";
 import cors from 'cors';
+
+const prisma = new PrismaClient();
 
 export const app = express();
 
@@ -13,12 +16,10 @@ async function startServer() {
     .post("/pogs", async (request, response) => {
       try {
         const { name, ticker_symbol, price, color } = request.body;
-        const connection = await pool.connect();
-        const newPogs = await connection.query(
-          "INSERT INTO pogs (name, ticker_symbol, price, color) VALUES ($1, $2, $3, $4) RETURNING *",
-          [name, ticker_symbol, price, color]
-        );
-        response.status(201).json(newPogs.rows);
+        const newPogs = await prisma.pogs.create({
+          data: { name, ticker_symbol, price, color}
+        })
+        response.status(201).send(newPogs);
       } catch (err) {
         console.log("error", err);
         response.status(500).json({ error: "failed to add pogs" });
@@ -26,9 +27,8 @@ async function startServer() {
     })
     .get("/pogs", async (_, response) => {
       try {
-        const connection = await pool.connect();
-        const result = await connection.query("SELECT * FROM pogs");
-        response.status(200).json(result.rows);
+        const result = await prisma.pogs.findMany();
+        response.status(200).json(result);
       } catch (err) {
         console.log("error", err);
         response.status(404).send("Not Found");
@@ -36,13 +36,11 @@ async function startServer() {
     })
     .get("/pogs/:id", async (request, response) => {
       try {
-        const id = request.params.id;
-        const connection = await pool.connect();
-        const result = await connection.query(
-          "SELECT * FROM pogs WHERE id = $1",
-          [id]
-        );
-        response.status(200).json(result.rows);
+        const user_id = request.params.id;
+        const result = await prisma.pogs.findUnique({
+          where: { id: user_id }
+        })
+        response.status(200).json(result);
       } catch (err) {
         console.log("error", err);
         response.status(404).send("Not found");
@@ -51,12 +49,11 @@ async function startServer() {
     .put("/pogs/:id", async (request, response) => {
       try {
         const { name, ticker_symbol, price, color } = request.body;
-        const connection = await pool.connect();
-        const result = await connection.query(
-          "UPDATE pogs SET name = $1, ticker_symbol = $2, price = $3, color = $4 WHERE id = $5 RETURNING *",
-          [name, ticker_symbol, price, color, request.params.id]
-        );
-        response.status(200).json(result.rows);
+        const result = await prisma.pogs.update({
+          where: { id: request.params.id },
+          data: { name, ticker_symbol, price, color }
+        })
+        response.status(200).json(result);
       } catch (err) {
         console.log("error", err);
         response.status(404).send("not found");
@@ -64,12 +61,10 @@ async function startServer() {
     })
     .delete("/pogs/:id", async (request, response) => {
       try {
-        const connection = await pool.connect();
-        const result = await connection.query(
-          "DELETE FROM pogs WHERE id = $1 RETURNING *",
-          [request.params.id]
-        );
-        response.status(200).json(result.rows);
+        const result = await prisma.pogs.delete({
+          where: { id: request.params.id }
+        })
+        response.status(200).json(result);
       } catch (err) {
         console.log("error", err);
         response.status(404).send("Not found");
@@ -99,6 +94,7 @@ async function startServer() {
         console.log("error", err);
         response.status(500).json({ error: "Failed to process checkout" });
       }
+      
     })
     .use(express.static("src"))
     .listen(3000, () => {
