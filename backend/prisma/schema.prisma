@@ -14,25 +14,25 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
+  id        String      @id @default(cuid())
+  auth0_id  String
+  email     String      @unique
   name      String
-  password  String
-  balance  Float    @default(0) // implement balance
+  balance   Float       @default(0) // implement balance
   Inventory Inventory[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 }
 
 model pogs {
-  id        String   @id @default(cuid())
-  name      String
+  id            String      @id @default(cuid())
+  name          String
   ticker_symbol String
-  price     Float
-  color    String
-  Inventory Inventory[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  price         Float
+  color         String
+  Inventory     Inventory[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
 
 model Inventory {
