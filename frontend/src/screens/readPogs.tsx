@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import useNavigation from '../components/navigation'
 
 const PogsList: React.FC = () => {
@@ -19,6 +20,16 @@ const PogsList: React.FC = () => {
     color: string } | null
     >
     ();
+
+    const handlePriceChange = async () => {
+      try {
+        await axios.put('http://localhost:3000/pogs-update-price');
+        getPogs();
+        alert('Price Updated')
+      } catch(error) {
+        console.error('Error updating Pog:', error);
+      }
+    }
 
   useEffect(() => {
     getPogs();
@@ -86,6 +97,15 @@ const PogsList: React.FC = () => {
       >
         Back
       </button>
+
+      <button
+        type="button"
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
+        onClick={handlePriceChange}
+      >
+        Random Price
+      </button>
+
       <h1 className="text-2xl font-bold mb-4">List of Pogs</h1>
       <div className="grid grid-cols-1 gap-4">
         {pogs.map((pog) => (

@@ -106,7 +106,29 @@ async function startServer () {
         response.status(404).send('not found')
       }
     })
-    .delete('/pogs/:id', async (request, response) => {
+
+    .put("/pogs-update-price", async (request, response) => {
+      try {
+        const pogsData = await prisma.pogs.findMany();
+        for (let pogs of pogsData) {
+
+          // number generated between -5 and 5
+          let randomAmountChange = Math.floor(Math.random() * 10) - 5;
+          let currentPrice = pogs.price;
+          let newPrice = currentPrice + randomAmountChange;
+          await prisma.pogs.update({
+            where: { id: pogs.id },
+            data: { price: newPrice, prevPrice: currentPrice }
+          })
+        }
+        response.status(200).json(pogsData);
+      } catch (err) {
+        console.log("error", err);
+        response.status(404).send("not found");
+      }
+    })
+
+    .delete("/pogs/:id", async (request, response) => {
       try {
         const result = await prisma.pogs.delete({
           where: { id: Number(request.params.id) }
@@ -204,11 +226,14 @@ async function startServer () {
         console.log('error', err);
         response.status(500).json({ error: 'Failed to create inventory' });
       }
+      
     })
     .use(express.static('src'))
     .listen(3000, () => {
       console.log('server started at http://localhost:3000')
     })
 }
+
+
 
 startServer()
