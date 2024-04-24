@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 import useNavigation from '../components/navigation'
 import { useNavigate } from 'react-router-dom';
+import PogMarquee from '../components/marquee';
 
 export interface Pog {
   id: number;
@@ -82,6 +83,7 @@ const UserPage: React.FC = () => {
         <p>Loading...</p>
       ) : isAuthenticated ? (
         <div>
+           <PogMarquee pogs={pogs} />
           <button
             className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded mb-6"
             onClick={handleLogout}
