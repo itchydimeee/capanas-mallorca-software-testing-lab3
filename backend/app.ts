@@ -18,7 +18,7 @@ async function startServer() {
         const { name, ticker_symbol, price, color } = request.body;
         const priceToInt = Number(price)
         const newPogs = await prisma.pogs.create({
-          data: { name, ticker_symbol, price: priceToInt, color}
+          data: { name, ticker_symbol, price: priceToInt, color }
         })
         response.status(201).send(newPogs);
       } catch (err) {
@@ -60,6 +60,28 @@ async function startServer() {
         response.status(404).send("not found");
       }
     })
+
+    .put("/pogs-update-price", async (request, response) => {
+      try {
+        const pogsData = await prisma.pogs.findMany();
+        for (let pogs of pogsData) {
+
+          // number generated between -5 and 5
+          let randomAmountChange = Math.floor(Math.random() * 10) - 5;
+          let currentPrice = pogs.price;
+          let newPrice = currentPrice + randomAmountChange;
+          await prisma.pogs.update({
+            where: { id: pogs.id },
+            data: { price: newPrice, prevPrice: currentPrice }
+          })
+        }
+        response.status(200).json(pogsData);
+      } catch (err) {
+        console.log("error", err);
+        response.status(404).send("not found");
+      }
+    })
+
     .delete("/pogs/:id", async (request, response) => {
       try {
         const result = await prisma.pogs.delete({
@@ -73,8 +95,8 @@ async function startServer() {
     })
     .post("/checkout", async (request, response) => {
       try {
-        const cartIds  = request.body;
-        console.log('Received request body:' , request.body)
+        const cartIds = request.body;
+        console.log('Received request body:', request.body)
         console.log('Received cartIds:', cartIds)
         const connection = await pool.connect();
 
@@ -92,12 +114,14 @@ async function startServer() {
         console.log("error", err);
         response.status(500).json({ error: "Failed to process checkout" });
       }
-      
+
     })
     .use(express.static("src"))
     .listen(3000, () => {
       console.log("server started at http://localhost:3000");
     });
 }
+
+
 
 startServer();
