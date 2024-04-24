@@ -1,27 +1,34 @@
 import React, { useState, useEffect } from 'react'
-import { useAuth0 } from '@auth0/auth0-react'
+import { User, useAuth0 } from '@auth0/auth0-react'
 import useNavigation from '../components/navigation'
-import { useNavigate } from 'react-router-dom';
-import PogMarquee from '../components/marquee';
+import { useNavigate } from 'react-router-dom'
+import PogMarquee from '../components/marquee'
+import { fetchUserFromDatabase, createUserInDatabase, updateUserInDatabase } from '../components/utils'
 
 export interface Pog {
-  id: number;
-  name: string;
-  ticker_symbol: string;
-  price: number;
-  color: string;
+  id: number
+  name: string
+  ticker_symbol: string
+  price: number
+  color: string
+  quantity: number
 }
 
 const UserPage: React.FC = () => {
   const { user, isAuthenticated, isLoading, logout } = useAuth0()
   const [pogs, setPogs] = useState<Pog[]>([])
-  const [cart, setCart] = useState<Pog[]>([])
-  const { ToAdminLogin } = useNavigation(cart)
+  const [selectedPogs, setSelectedPogs] = useState<Pog[]>([])
+  const { ToAdminLogin, ToCheckout } = useNavigation((selectedPogs: Pog[]) => {
+    navigate('/checkout', { state: { selectedPogs } })
+  })
   const navigate = useNavigate()
 
   useEffect(() => {
     getPogs()
-  }, [])
+    if (user) {
+      handleUserData(user)
+    }
+  }, [user])
 
   const getPogs = async () => {
     try {
@@ -39,41 +46,39 @@ const UserPage: React.FC = () => {
     }
   }
 
-
-  const handleAddToCart = (pog: Pog) => {
-    setCart([...cart, pog])
+  const handleCheckout = (pog: Pog) => {
+    const updatedSelectedPogs = [...selectedPogs, pog]
+    setSelectedPogs(updatedSelectedPogs)
+    ToCheckout(updatedSelectedPogs)
   }
-
-  const handleRemoveFromCart = (pog: Pog) => {
-    setCart(cart.filter((item) => item.id !== pog.id))
-  }
-
-
-  const handleCheckout = async () => {
-    try {
-      const cartIds = cart.map((pog) => pog.id);
-      console.log('Checkout cartIds:', cartIds);
-      const response = await fetch('http://localhost:3000/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(cartIds),
-      });
-      console.log('Checkout response:', response);
-      if (!response.ok) {
-        throw new Error('Failed to checkout');
-      }
-      const { totalPrice } = await response.json();
-      console.log('Total Price:', totalPrice);
-      navigate('/checkout', {state: { cart, totalPrice}})
-    } catch (error) {
-      console.error('Error during checkout:', error);
-    }
-  };
-  
-
 
   const handleLogout = async () => {
     await logout({ logoutParams: { returnTo: window.location.origin } })
+  }
+
+  const handleUserData = async (user: User) => {
+    try {
+      const auth0Id = user?.sub
+      if (typeof auth0Id === 'string') {
+        const existingUser = await fetchUserFromDatabase(auth0Id)
+
+        if (existingUser) {
+          const updatedUser = await updateUserInDatabase(auth0Id, {
+            name: user.name || '',
+            email: user.email || ''
+          })
+          console.log('User updated:', updatedUser)
+        } else {
+          // User doesn't exist in the database, create a new user
+          const newUser = await createUserInDatabase(auth0Id, user)
+          console.log('New user created:', newUser)
+        }
+      } else {
+        console.error('Invalid auth0Id:', auth0Id)
+      }
+    } catch (error) {
+      console.error('Error handling user data:', error)
+    }
   }
 
   return (
@@ -83,7 +88,7 @@ const UserPage: React.FC = () => {
         <p>Loading...</p>
       ) : isAuthenticated ? (
         <div>
-           <PogMarquee pogs={pogs} />
+          <PogMarquee pogs={pogs} />
           <button
             className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded mb-6"
             onClick={handleLogout}
@@ -121,32 +126,15 @@ const UserPage: React.FC = () => {
                   </p>
                   <p className="text-gray-600 mb-2">Price: {pog.price}</p>
                   <p className="text-gray-600 mb-2">Color: {pog.color}</p>
-                  {cart.some((item) => item.id === pog.id) ? (
-                    <button
-                      className="bg-red-600 hover:bg-red-500 px-4 py-2 text-white rounded-md"
-                      onClick={() => handleRemoveFromCart(pog)}
-                    >
-                      Remove from Cart
-                    </button>
-                  ) : (
-                    <button
-                      className="bg-blue-600 hover:bg-blue-500 px-4 py-2 text-white rounded-md"
-                      onClick={() => handleAddToCart(pog)}
-                    >
-                      Add to Cart
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    className="bg-green-600 hover:bg-green-500 px-4 py-2 text-white rounded-md mb-5"
+                    onClick={() => handleCheckout(pog)}
+                  >
+                    Checkout
+                  </button>
                 </div>
               ))}
-              {cart.length > 0 && (
-                <button
-                type="button"
-                  className="bg-green-600 hover:bg-green-500 px-4 py-2 text-white rounded-md mb-5"
-                  onClick={handleCheckout}
-                >
-                  Checkout
-                </button>
-              )}
             </div>
           ) : (
             <p>No pogs available.</p>
