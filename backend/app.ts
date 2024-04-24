@@ -16,8 +16,9 @@ async function startServer() {
     .post("/pogs", async (request, response) => {
       try {
         const { name, ticker_symbol, price, color } = request.body;
+        const priceToInt = Number(price)
         const newPogs = await prisma.pogs.create({
-          data: { name, ticker_symbol, price, color}
+          data: { name, ticker_symbol, price: priceToInt, color}
         })
         response.status(201).send(newPogs);
       } catch (err) {
@@ -36,7 +37,7 @@ async function startServer() {
     })
     .get("/pogs/:id", async (request, response) => {
       try {
-        const user_id = request.params.id;
+        const user_id = Number(request.params.id);
         const result = await prisma.pogs.findUnique({
           where: { id: user_id }
         })
@@ -50,7 +51,7 @@ async function startServer() {
       try {
         const { name, ticker_symbol, price, color } = request.body;
         const result = await prisma.pogs.update({
-          where: { id: request.params.id },
+          where: { id: Number(request.params.id) },
           data: { name, ticker_symbol, price, color }
         })
         response.status(200).json(result);
@@ -62,7 +63,7 @@ async function startServer() {
     .delete("/pogs/:id", async (request, response) => {
       try {
         const result = await prisma.pogs.delete({
-          where: { id: request.params.id }
+          where: { id: Number(request.params.id) }
         })
         response.status(200).json(result);
       } catch (err) {
@@ -85,9 +86,6 @@ async function startServer() {
         console.log('Query result:', result);
         const { total_price } = result.rows[0];
         console.log('total price:', total_price)
-
-        // Update the order status or perform any other necessary actions
-        // ...
 
         response.status(200).json({ totalPrice: total_price });
       } catch (err) {
