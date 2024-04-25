@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
 interface Pog {
+  quantity: number;
   id: number;
   name: string;
   ticker_symbol: string;
@@ -8,8 +9,8 @@ interface Pog {
   color: string;
 }
 
-function useNavigation(cart: Pog[] = []) {
-  const navigate = useNavigate();
+const useNavigation = (onCheckout?: (selectedPogs: Pog[]) => void) => {
+  const navigate = useNavigate()
 
   function navigateTo(path: string, state?: any) {
     navigate(path, { state });
@@ -34,12 +35,19 @@ function useNavigation(cart: Pog[] = []) {
   function ToUserPage() {
     navigateTo('/user');
   }
-
-  function toCheckout() {
-    navigateTo('/checkout', { state: { cart } });
+  function ToInventory() {
+    navigateTo('/inventory')
   }
 
-  return { ToCreatePogs, ToLogin, ToAdminLogin, ToReadPogs, ToUserPage, toCheckout };
+  const ToCheckout = (selectedPogs: Pog[]) => {
+    if (onCheckout) {
+      onCheckout(selectedPogs)
+    } else {
+      navigate('/checkout', { state: { selectedPogs } })
+    }
+  }
+
+  return { ToCreatePogs, ToLogin, ToAdminLogin, ToReadPogs, ToUserPage, ToCheckout, ToInventory };
 }
 
 export default useNavigation;
