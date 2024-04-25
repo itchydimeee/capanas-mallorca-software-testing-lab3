@@ -19,7 +19,7 @@ const LoginForm: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="spinner border-4 border-blue-500 rounded-full w-12 h-12 animate-spin"></div>
+        <div className="spinner border-4 border-blue-500 rounded-full w-12 h-12 animate-spin" data-testid="spinner"></div>
       </div>
     );
   }
@@ -37,6 +37,7 @@ const LoginForm: React.FC = () => {
         </h1>
         <form onSubmit={handleSubmit} className="space-y-4 text-center">
           <button
+            id='login-button'
             type="submit"
             className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300"
           >
