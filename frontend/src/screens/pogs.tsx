@@ -3,6 +3,8 @@ import useNavigation from '../components/navigation'
 import 'tailwindcss/tailwind.css'
 import { useAuth0 } from '@auth0/auth0-react';
 
+
+
 const PogsForm: React.FC = () => {
   const { ToReadPogs, ToUserPage } = useNavigation()
   const { logout } = useAuth0();
@@ -26,7 +28,7 @@ const PogsForm: React.FC = () => {
       })
 
       if (response.ok) {
-        alert('submission succesful') // Redirect after successful form submission
+        alert('submission successful') // Redirect after successful form submission
       } else {
         console.error('Error submitting form:', response.statusText)
         alert('invalid submission')
@@ -49,7 +51,7 @@ const PogsForm: React.FC = () => {
       <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4'
       onClick={ToUserPage}>Back</button>
       <h1 className='text-2xl font-bold mb-4'>Create Pogs Form</h1>
-      <form onSubmit={handleSubmit} className='space-y-4'>
+      <form onSubmit={handleSubmit} className='space-y-4' data-testid='pogs-form'>
         <div className='flex flex-col'>
           <label htmlFor='name' className='text-sm font-bold'>
             Name:
