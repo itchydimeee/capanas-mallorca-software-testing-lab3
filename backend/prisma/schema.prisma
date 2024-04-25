@@ -15,7 +15,7 @@ datasource db {
 
 model User {
   id        Int         @id @default(autoincrement())
-  auth0_id  String
+  auth0_id  String      @unique
   email     String      @unique
   name      String
   balance   Float       @default(1000)

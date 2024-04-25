@@ -30,9 +30,13 @@ const CheckoutPage: React.FC = () => {
     setTotalPrice(total)
   }, [cart])
 
-  const handleQuantityChange = (index: number, change: number) => {
-    const updatedCart = [...cart];
-    updatedCart[index].quantity = Math.max(updatedCart[index].quantity + change, 1);
+  const handleQuantityChange = (index: number, quantity: number) => {
+    const updatedCart = cart.map((item, i) => {
+      if (i === index) {
+        return { ...item, quantity };
+      }
+      return item;
+    });
     setCart(updatedCart);
   };
 
@@ -47,24 +51,29 @@ const CheckoutPage: React.FC = () => {
           cartData: cart,
           userId: user?.sub
         })
-      })
-
+      });
+  
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error)
+        const error = await response.json();
+        throw new Error(error.error);
       }
-
-      const { totalPrice } = await response.json()
-      setTotalPrice(totalPrice)
-
+  
+      const { totalPrice } = await response.json();
+      setTotalPrice(totalPrice);
+  
       // Clear the cart after successful checkout
-      setCart([])
-      navigate('/user')
+      setCart([]);
+      navigate('/user');
     } catch (error) {
-      console.error('Error during checkout:', error)
-      // Handle the error, e.g., display an error message to the user
+      if (error instanceof Error && error.message === 'Insufficient balance') {
+        // Display an error message to the user
+        alert('Insufficient balance to complete the purchase.');
+      } else {
+        console.error('Error during checkout:', error);
+        // Handle other errors, e.g., display an error message to the user
+      }
     }
-  }
+  };
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -98,21 +107,20 @@ const CheckoutPage: React.FC = () => {
                   <p className="text-gray-600 mb-2">Price: {item.price}</p>
                   <p className="text-gray-600 mb-2">Color: {item.color}</p>
                   <div className="flex items-center">
-                    <button
-                      type="button"
-                      className="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded-l-md"
-                      onClick={() => handleQuantityChange(index, -1)}
-                    >
-                      -
-                    </button>
-                    <p className="px-4">{item.quantity}</p>
-                    <button
-                      type="button"
-                      className="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded-r-md"
-                      onClick={() => handleQuantityChange(index, 1)}
-                    >
-                      +
-                    </button>
+                    <label htmlFor={`quantity-${index}`} className="mr-2">
+                      Quantity:
+                    </label>
+                    <input
+                      type="number"
+                      id={`quantity-${index}`}
+                      name={`quantity-${index}`}
+                      min="1"
+                      defaultValue="1"
+                      className="border border-gray-300 rounded-md px-2 py-1 w-20"
+                      onChange={(e) =>
+                        handleQuantityChange(index, parseInt(e.target.value))
+                      }
+                    />
                   </div>
                 </div>
               ))}
@@ -126,10 +134,13 @@ const CheckoutPage: React.FC = () => {
                 >
                   Complete Checkout
                 </button>
-                <button type="button" 
-                className="bg-red-600 hover:bg-red-500 px-4 py-2 text-white rounded-md mt-4"
-                onClick={ToUserPage}
-                > Cancel Transaction</button>
+                <button
+                  type="button"
+                  className="bg-red-600 hover:bg-red-500 px-4 py-2 text-white rounded-md mt-4"
+                  onClick={ToUserPage}
+                >
+                  Cancel Transaction
+                </button>
               </div>
             </div>
           ) : (

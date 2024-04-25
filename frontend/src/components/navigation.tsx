@@ -35,6 +35,9 @@ const useNavigation = (onCheckout?: (selectedPogs: Pog[]) => void) => {
   function ToUserPage() {
     navigateTo('/user');
   }
+  function ToInventory() {
+    navigateTo('/inventory')
+  }
 
   const ToCheckout = (selectedPogs: Pog[]) => {
     if (onCheckout) {
@@ -44,7 +47,7 @@ const useNavigation = (onCheckout?: (selectedPogs: Pog[]) => void) => {
     }
   }
 
-  return { ToCreatePogs, ToLogin, ToAdminLogin, ToReadPogs, ToUserPage, ToCheckout };
+  return { ToCreatePogs, ToLogin, ToAdminLogin, ToReadPogs, ToUserPage, ToCheckout, ToInventory };
 }
 
 export default useNavigation;

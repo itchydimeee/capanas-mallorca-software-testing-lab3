@@ -8,6 +8,7 @@ import LoginForm from './screens/login';
 import UserPage from './screens/user';
 import AdminLogin from './screens/adminLogin';
 import CheckoutPage from './screens/checkout';
+import InventoryPage from './screens/inventory';
 
 const App: React.FC = () => {
   return (
@@ -21,6 +22,7 @@ const App: React.FC = () => {
         <Route path="/render-pogs" element={<RenderPogs />} />
         <Route path="/user" element={<UserPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/inventory" element={<InventoryPage />} />
       </Routes>
     </Router>
   );

@@ -6,7 +6,7 @@ export interface DatabaseUser {
   auth0_id: string;
   name: string;
   email: string;
-  money_balance: number;
+  balance: number;
 }
 
 export const fetchUserFromDatabase = async (auth0Id: string): Promise<DatabaseUser | null> => {
