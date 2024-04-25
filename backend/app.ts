@@ -32,21 +32,23 @@ async function startServer () {
     })
     .post('/users', async (request, response) => {
       try {
-        const { auth0_id, email, name } = request.body;
-    
+        const { auth0_id, email, name } = request.body
+
         // Check if a user with the same email already exists
-        const existingUser = await prisma.user.findUnique({ where: { email } });
+        const existingUser = await prisma.user.findUnique({ where: { email } })
         if (existingUser) {
-          return response.status(400).json({ error: 'User with this email already exists' });
+          return response
+            .status(400)
+            .json({ error: 'User with this email already exists' })
         }
-    
+
         const newUser = await prisma.user.create({
-          data: { auth0_id, email, name },
-        });
-        response.status(201).json(newUser);
+          data: { auth0_id, email, name }
+        })
+        response.status(201).json(newUser)
       } catch (err) {
-        console.log('error', err);
-        response.status(500).json({ error: 'failed to create user' });
+        console.log('error', err)
+        response.status(500).json({ error: 'failed to create user' })
       }
     })
     .put('/users/:userId', async (request, response) => {
@@ -56,13 +58,13 @@ async function startServer () {
 
         const user = await prisma.user.findUnique({
           where: {
-            id: userId,
-          },
-        });
-    
+            id: userId
+          }
+        })
+
         if (!user) {
-          response.status(404).send('User not found');
-          return;
+          response.status(404).send('User not found')
+          return
         }
 
         const updatedUser = await prisma.user.update({
@@ -83,10 +85,13 @@ async function startServer () {
       try {
         const pogsData = await prisma.pogs.findMany()
         for (let pogs of pogsData) {
-          // number generated between -5 and 5
-          let randomAmountChange = Math.floor(Math.random() * 10) - 5
-          let currentPrice = pogs.price
-          let newPrice = currentPrice + randomAmountChange
+          let randomAmountChange = Math.floor(Math.random() * 10) - 5;
+          let currentPrice = pogs.price;
+          let newPrice = currentPrice + randomAmountChange;
+          if (newPrice < 0) {
+            newPrice = 1
+          }
+
           await prisma.pogs.update({
             where: { id: pogs.id },
             data: { price: newPrice, prevPrice: currentPrice }
@@ -102,6 +107,14 @@ async function startServer () {
       try {
         const { name, ticker_symbol, price, color } = request.body
         const priceToInt = Number(price)
+
+        // Validate that the price is not negative
+        if (priceToInt < 0) {
+          return response
+            .status(400)
+            .json({ error: 'Price cannot be negative' })
+        }
+
         const newPogs = await prisma.pogs.create({
           data: { name, ticker_symbol, price: priceToInt, color }
         })
@@ -113,7 +126,16 @@ async function startServer () {
     })
     .get('/pogs', async (_, response) => {
       try {
-        const result = await prisma.pogs.findMany()
+        const result = await prisma.pogs.findMany({
+          select: {
+            id: true,
+            name: true,
+            ticker_symbol: true,
+            price: true,
+            prevPrice: true,
+            color: true
+          }
+        })
         response.status(200).json(result)
       } catch (err) {
         console.log('error', err)
@@ -135,6 +157,14 @@ async function startServer () {
     .put('/pogs/:id', async (request, response) => {
       try {
         const { name, ticker_symbol, price, color } = request.body
+
+        // Validate that the price is not negative
+        if (price < 0) {
+          return response
+            .status(400)
+            .json({ error: 'Price cannot be negative' })
+        }
+
         const result = await prisma.pogs.update({
           where: { id: Number(request.params.id) },
           data: { name, ticker_symbol, price, color }
@@ -147,13 +177,31 @@ async function startServer () {
     })
     .delete('/pogs/:id', async (request, response) => {
       try {
+        // Check if the POG exists
+        const pog = await prisma.pogs.findUnique({
+          where: { id: Number(request.params.id) }
+        })
+
+        if (!pog) {
+          // If the POG doesn't exist, return a 404 Not Found error
+          return response.status(404).send('Not found')
+        }
+
+        // Delete the associated records in the Inventory table
+        await prisma.inventory.deleteMany({
+          where: {
+            pogId: Number(request.params.id)
+          }
+        })
+
+        // Now delete the POG
         const result = await prisma.pogs.delete({
           where: { id: Number(request.params.id) }
         })
         response.status(200).json(result)
       } catch (err) {
         console.log('error', err)
-        response.status(404).send('Not found')
+        response.status(500).send('An error occurred while deleting the POG')
       }
     })
     .post('/checkout', async (request, response) => {
@@ -182,13 +230,34 @@ async function startServer () {
               throw new Error('Insufficient balance')
             }
 
-            await prisma.inventory.create({
-              data: {
+            // Check if there's an existing row in the inventory table
+            const existingInventory = await prisma.inventory.findFirst({
+              where: {
                 userId: user.id,
-                pogId: item.id,
-                quantity: item.quantity
+                pogId: item.id
               }
             })
+
+            if (existingInventory) {
+              // Update the existing row
+              await prisma.inventory.update({
+                where: {
+                  id: existingInventory.id
+                },
+                data: {
+                  quantity: existingInventory.quantity + item.quantity
+                }
+              })
+            } else {
+              // Create a new row
+              await prisma.inventory.create({
+                data: {
+                  userId: user.id,
+                  pogId: item.id,
+                  quantity: item.quantity
+                }
+              })
+            }
           })
         )
 
@@ -215,86 +284,90 @@ async function startServer () {
     })
     .post('/sell', async (request, response) => {
       try {
-        const { userId, pogId, quantityToSell } = request.body;
-    
+        const { userId, pogId, quantityToSell } = request.body
+
         // Find the user
         const user = await prisma.user.findUnique({
-          where: { auth0_id: userId },
-        });
+          where: { auth0_id: userId }
+        })
         if (!user) {
-          return response.status(404).json({ error: 'User not found' });
+          return response.status(404).json({ error: 'User not found' })
         }
-    
+
         // Find the pog
         const pog = await prisma.pogs.findUnique({
-          where: { id: pogId },
-        });
+          where: { id: pogId }
+        })
         if (!pog) {
-          return response.status(404).json({ error: 'Pog not found' });
+          return response.status(404).json({ error: 'Pog not found' })
         }
-    
+
         // Find the inventory item
         const inventoryItem = await prisma.inventory.findFirst({
           where: {
             userId: user.id,
-            pogId: pog.id,
-          },
-        });
+            pogId: pog.id
+          }
+        })
         if (!inventoryItem) {
-          return response.status(404).json({ error: 'Inventory item not found' });
+          return response
+            .status(404)
+            .json({ error: 'Inventory item not found' })
         }
-    
+
         // Check if the user has enough quantity to sell
         if (inventoryItem.quantity < quantityToSell) {
-          return response.status(400).json({ error: 'Insufficient quantity to sell' });
+          return response
+            .status(400)
+            .json({ error: 'Insufficient quantity to sell' })
         }
-    
+
         // Calculate the total sale amount
-        const totalSaleAmount = pog.price * quantityToSell;
-    
+        const totalSaleAmount = pog.price * quantityToSell
+
         // Update the user's balance
         await prisma.user.update({
           where: { id: user.id },
-          data: { balance: user.balance + totalSaleAmount },
-        });
-    
+          data: { balance: user.balance + totalSaleAmount }
+        })
+
         // Update the inventory item
         await prisma.inventory.update({
           where: { id: inventoryItem.id },
-          data: { quantity: inventoryItem.quantity - quantityToSell },
-        });
-    
-        response.status(200).json({ totalSaleAmount });
+          data: { quantity: inventoryItem.quantity - quantityToSell }
+        })
+
+        response.status(200).json({ totalSaleAmount })
       } catch (err) {
-        console.error('Error selling pogs:', err);
-        response.status(500).json({ error: 'Failed to sell pogs' });
+        console.error('Error selling pogs:', err)
+        response.status(500).json({ error: 'Failed to sell pogs' })
       }
     })
     .get('/inventory/:userId', async (request, response) => {
       try {
-        const userId = request.params.userId;
+        const userId = request.params.userId
         const user = await prisma.user.findUnique({
-          where: { auth0_id: userId },
-        });
+          where: { auth0_id: userId }
+        })
         if (!user) {
-          console.log('User not found');
-          return response.status(404).json({ error: 'User not found' });
+          console.log('User not found')
+          return response.status(404).json({ error: 'User not found' })
         }
-    
-        console.log('User found:', user);
-    
+
+        console.log('User found:', user)
+
         const inventory = await prisma.inventory.findMany({
           where: { userId: user.id },
           include: {
-            pog: true,
-          },
-        });
-    
-        console.log('Inventory response:', inventory);
-        response.status(200).json(inventory);
+            pog: true
+          }
+        })
+
+        console.log('Inventory response:', inventory)
+        response.status(200).json(inventory)
       } catch (err) {
-        console.log('Error fetching inventory:', err);
-        response.status(500).json({ error: 'Failed to fetch inventory' });
+        console.log('Error fetching inventory:', err)
+        response.status(500).json({ error: 'Failed to fetch inventory' })
       }
     })
     .use(express.static('src'))

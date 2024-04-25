@@ -3,20 +3,15 @@ import { User, useAuth0 } from '@auth0/auth0-react';
 import useNavigation from '../components/navigation';
 import { useNavigate } from 'react-router-dom';
 import PogMarquee from '../components/marquee';
+import { Pog } from '../components/types';
 import {
   fetchUserFromDatabase,
   createUserInDatabase,
   updateUserInDatabase
 } from '../components/utils';
 
-export interface Pog {
-  id: number;
-  name: string;
-  ticker_symbol: string;
-  price: number;
-  color: string;
-  quantity: number;
-}
+
+
 
 const UserPage: React.FC = () => {
   const { user, isAuthenticated, isLoading, logout } = useAuth0();
@@ -90,7 +85,6 @@ const UserPage: React.FC = () => {
     setSelectedPogs(updatedSelectedPogs);
     ToCheckout(updatedSelectedPogs);
   };
-
   const handleLogout = async () => {
     await logout({ logoutParams: { returnTo: window.location.origin } });
   };

@@ -1,13 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-
-interface Pog {
-  quantity: number;
-  id: number;
-  name: string;
-  ticker_symbol: string;
-  price: number;
-  color: string;
-}
+import { Pog } from './types';
 
 const useNavigation = (onCheckout?: (selectedPogs: Pog[]) => void) => {
   const navigate = useNavigate()
