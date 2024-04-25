@@ -1,11 +1,11 @@
+/* eslint-disable testing-library/prefer-screen-queries */
 import React from "react";
 import { render, waitFor, screen } from "@testing-library/react";
 import InventoryPage from "../src/screens/inventory";
 import { useAuth0 } from "@auth0/auth0-react";
-import "@testing-library/jest-dom"; // Importing to extend Jest matchers
+import "@testing-library/jest-dom"; 
 import { BrowserRouter } from "react-router-dom";
 
-// Mocking useAuth0 hook
 jest.mock("@auth0/auth0-react", () => ({
   useAuth0: jest.fn().mockReturnValue({
     user: { sub: "user123" },
@@ -15,23 +15,19 @@ jest.mock("@auth0/auth0-react", () => ({
 }));
 
 describe("InventoryPage Component", () => {
-  // Mocking useAuth0 return values
   const mockUseAuth0 = jest.fn();
 
   beforeEach(() => {
-    // Clear mock calls and set default return values before each test
     mockUseAuth0.mockClear();
   });
 
   it("renders InventoryPage component with inventory items", async () => {
-    // Mocking isAuthenticated, user, and isLoading
     mockUseAuth0.mockReturnValue({
       isAuthenticated: true,
       user: { sub: "user123" },
       isLoading: false,
     });
 
-    // Mocking fetch request for inventory
     global.fetch = jest.fn().mockResolvedValueOnce({
       ok: true,
       json: () =>
@@ -56,7 +52,6 @@ describe("InventoryPage Component", () => {
       </BrowserRouter>
     );
 
-    // Wait for the inventory items to be rendered
     await waitFor(() => {
       const samplePog = screen.queryByText("Sample Pog");
       expect(samplePog).not.toBeNull();
@@ -109,7 +104,6 @@ describe("InventoryPage Component", () => {
   });
 
   it("displays loading message while fetching inventory", () => {
-    // Mocking isAuthenticated, user, and isLoading to simulate loading state
     mockUseAuth0.mockReturnValueOnce({
       isAuthenticated: true,
       user: { sub: "user123" },
@@ -122,9 +116,7 @@ describe("InventoryPage Component", () => {
       </BrowserRouter>
     );
 
-    // eslint-disable-next-line testing-library/prefer-presence-queries, testing-library/prefer-screen-queries
     expect(getByText("Your Inventory")).toBeInTheDocument();
   });
 
-  //   Add more test cases as needed for different scenarios
 });
