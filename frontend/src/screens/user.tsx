@@ -103,7 +103,6 @@ const UserPage: React.FC = () => {
           });
           console.log('User updated:', updatedUser);
         } else {
-          // User doesn't exist in the database, create a new user
           const newUser = await createUserInDatabase(auth0Id, user);
           console.log('New user created:', newUser);
         }

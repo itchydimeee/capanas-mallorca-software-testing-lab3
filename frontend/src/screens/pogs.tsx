@@ -28,7 +28,7 @@ const PogsForm: React.FC = () => {
       })
 
       if (response.ok) {
-        alert('submission successful') // Redirect after successful form submission
+        alert('submission successful')
       } else {
         console.error('Error submitting form:', response.statusText)
         alert('invalid submission')

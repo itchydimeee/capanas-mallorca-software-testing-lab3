@@ -12,7 +12,7 @@ const AdminLogin: React.FC = () => {
       if (user && isUserAdmin(user)) {
         navigate('/pogs');
       } else {
-        // alert('Not an Admin Email');
+        alert('Not an Admin Email');
       }
     }
   }, [isAuthenticated, isLoading, user, navigate]);
@@ -33,7 +33,6 @@ const AdminLogin: React.FC = () => {
     );
   }
 
-  // Render a message with a return button if the user is authenticated but not an admin
   if (isAuthenticated) {
     return (
       <div className="flex justify-center items-center flex-col h-screen">

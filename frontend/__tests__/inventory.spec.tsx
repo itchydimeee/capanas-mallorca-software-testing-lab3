@@ -1,60 +1,121 @@
+/* eslint-disable testing-library/prefer-screen-queries */
 import React from "react";
 import { render, waitFor, screen } from "@testing-library/react";
-import axios, { AxiosResponse } from "axios";
-import { Auth0Provider } from "@auth0/auth0-react";
+import InventoryPage from "../src/screens/inventory";
+import "@testing-library/jest-dom"; 
 import { BrowserRouter } from "react-router-dom";
-import SpecificExportName from "../src/screens/checkout"; // Make sure the path is correct
-import { useAuth0 } from "@auth0/auth0-react";
 
 jest.mock("@auth0/auth0-react", () => ({
-  useAuth0: jest.fn(), // Mocking the useAuth0 hook
+  useAuth0: jest.fn().mockReturnValue({
+    user: { sub: "user123" },
+    isAuthenticated: true,
+    isLoading: false,
+  }),
 }));
 
-const mockSelectedPogs = [
-  {
-    id: 1,
-    name: "Pog 1",
-    ticker_symbol: "POG1",
-    price: 10.99,
-    color: "red",
-    quantity: 1,
-  },
-  {
-    id: 2,
-    name: "Pog 2",
-    ticker_symbol: "POG2",
-    price: 15.99,
-    color: "blue",
-    quantity: 1,
-  },
-];
+describe("InventoryPage Component", () => {
+  const mockUseAuth0 = jest.fn();
 
-describe("CheckoutPage", () => {
   beforeEach(() => {
-    axios.get = jest.fn().mockResolvedValueOnce({ data: mockSelectedPogs } as AxiosResponse<any>);
+    mockUseAuth0.mockClear();
   });
 
-  it("renders correctly when not authenticated", async () => {
-    // Mock the return value of useAuth0 to simulate not authenticated user
-    useAuth0.mockReturnValue({
-      isAuthenticated: false,
-      user: null,
+  it("renders InventoryPage component with inventory items", async () => {
+    mockUseAuth0.mockReturnValue({
+      isAuthenticated: true,
+      user: { sub: "user123" },
       isLoading: false,
+    });
+
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: true,
+      json: () =>
+        Promise.resolve([
+          {
+            id: 1,
+            quantity: 5,
+            pog: {
+              id: 1,
+              name: "Sample Pog",
+              ticker_symbol: "SPG",
+              price: 10,
+              color: "blue",
+            },
+          },
+        ]),
     });
 
     render(
       <BrowserRouter>
-        <Auth0Provider
-          domain="dev-eu8aiywpss3vtys4.us.auth0.com"
-          clientId="SF07cvV5Glzax1ieezv28gT0q8bSMMJn"
-        >
-          <SpecificExportName /> {/* Render the specific export */}
-        </Auth0Provider>
+        <InventoryPage />
       </BrowserRouter>
     );
 
-    // Add assertions for the content visible when not authenticated
-    expect(screen.getByText("Capanas and Mallorca Pogs Center")).toBeInTheDocument();
-    expect(screen.getByText("Please log in")).toBeInTheDocument();
+    await waitFor(() => {
+      const samplePog = screen.queryByText("Sample Pog");
+      expect(samplePog).not.toBeNull();
+    });
+
+    await waitFor(() => {
+      const samplePog = screen.queryByText("Sample Pog");
+      expect(samplePog).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      const tickerSymbol = screen.queryByText("Ticker Symbol: SPG");
+      expect(tickerSymbol).not.toBeNull();
+    });
+
+    await waitFor(() => {
+      const tickerSymbol = screen.queryByText("Ticker Symbol: SPG");
+      expect(tickerSymbol).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      const price = screen.queryByText("Price: 10");
+      expect(price).not.toBeNull();
+    });
+
+    await waitFor(() => {
+      const price = screen.queryByText("Price: 10");
+      expect(price).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      const color = screen.queryByText("Color: blue");
+      expect(color).not.toBeNull();
+    });
+
+    await waitFor(() => {
+      const color = screen.queryByText("Color: blue");
+      expect(color).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      const quantity = screen.queryByText("Quantity: 5");
+      expect(quantity).not.toBeNull();
+    });
+
+    await waitFor(() => {
+      const quantity = screen.queryByText("Quantity: 5");
+      expect(quantity).toBeInTheDocument();
+    });
   });
+
+  it("displays loading message while fetching inventory", () => {
+    mockUseAuth0.mockReturnValueOnce({
+      isAuthenticated: true,
+      user: { sub: "user123" },
+      isLoading: true,
+    });
+
+    const { getByText } = render(
+      <BrowserRouter>
+        <InventoryPage />
+      </BrowserRouter>
+    );
+
+    expect(getByText("Your Inventory")).toBeInTheDocument();
+  });
+
 });

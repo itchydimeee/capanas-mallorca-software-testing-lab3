@@ -1,4 +1,3 @@
-// types.ts
 export interface Pog {
     id: number;
     name: string;
