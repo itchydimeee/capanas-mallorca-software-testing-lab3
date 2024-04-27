@@ -105,8 +105,16 @@ async function startServer () {
     .post('/pogs', async (request, response) => {
       try {
         const { name, ticker_symbol, price, color } = request.body
-        const priceToInt = Number(price)
 
+        if (!name || !ticker_symbol || !price || !color) {
+          return response.status(400).json({ error: 'All fields are required' })
+        }
+        const priceToInt = Number(price)
+        if (isNaN(priceToInt)) {
+          return response
+            .status(400)
+            .json({ error: 'Price must be a valid number' })
+        }
         if (priceToInt < 0) {
           return response
             .status(400)
