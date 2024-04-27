@@ -1,7 +1,7 @@
 /* eslint-disable testing-library/prefer-screen-queries */
 import React from "react";
-import { render, fireEvent, waitFor, screen } from "@testing-library/react";
-import { Auth0Provider, useAuth0 } from "@auth0/auth0-react";
+import { render, fireEvent, waitFor } from "@testing-library/react";
+import { useAuth0 } from "@auth0/auth0-react";
 import LoginForm from "../src/screens/login";
 import { BrowserRouter as Router } from "react-router-dom";
 import "@testing-library/jest-dom";

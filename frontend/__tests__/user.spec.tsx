@@ -1,8 +1,6 @@
 import React from "react";
-import { render, waitFor, screen } from "@testing-library/react";
-import axios from "axios";
+import { render, waitFor} from "@testing-library/react";
 import UserPage from "../src/screens/user"; // Corrected import
-import { Auth0Provider } from "@auth0/auth0-react";
 import { BrowserRouter } from "react-router-dom";
 import "@testing-library/jest-dom";
 
