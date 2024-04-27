@@ -163,10 +163,24 @@ async function startServer () {
     .put('/pogs/:id', async (request, response) => {
       try {
         const { name, ticker_symbol, price, color } = request.body
-        if (price < 0) {
+        const priceToInt = Number(price)
+        if (isNaN(priceToInt)) {
+          return response
+            .status(400)
+            .json({ error: 'Price must be a valid number' })
+        }
+
+        if (priceToInt < 0) {
           return response
             .status(400)
             .json({ error: 'Price cannot be negative' })
+        }
+        const id = Number(request.params.id)
+        if (isNaN(id)) {
+          return response.status(400).json({ error: 'Invalid ID' })
+        }
+        if (!name || !ticker_symbol || !price || !color) {
+          return response.status(400).json({ error: 'All fields are required' })
         }
 
         const result = await prisma.pogs.update({
