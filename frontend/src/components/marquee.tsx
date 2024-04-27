@@ -9,7 +9,7 @@ interface MarqueeProps {
 const PogMarquee: React.FC<MarqueeProps> = ({ pogs }) => {
   const calculatePercentageChange = (currentPrice: number, prevPrice: number | null) => {
     if (prevPrice === null || prevPrice === 0) {
-      return 'N/A';
+      return '0.00%';
     }
     const percentageChange = ((currentPrice - prevPrice) / prevPrice) * 100;
     return `${percentageChange.toFixed(2)}%`;

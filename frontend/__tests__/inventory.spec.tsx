@@ -2,7 +2,6 @@
 import React from "react";
 import { render, waitFor, screen } from "@testing-library/react";
 import InventoryPage from "../src/screens/inventory";
-import { useAuth0 } from "@auth0/auth0-react";
 import "@testing-library/jest-dom"; 
 import { BrowserRouter } from "react-router-dom";
 

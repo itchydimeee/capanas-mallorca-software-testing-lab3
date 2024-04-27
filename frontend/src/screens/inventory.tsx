@@ -73,19 +73,15 @@ const InventoryPage: React.FC = () => {
         if (!response.ok) {
           const errorStatus = response.status;
           let errorMessage = 'Failed to sell pogs';
-
-          // Check the response status and handle the error accordingly
           if (errorStatus === 404) {
             errorMessage = 'Pog or user not found';
           } else if (errorStatus === 400) {
             errorMessage = 'Insufficient quantity to sell';
           } else {
-            // Try to get the error message from the response
             try {
               const errorData = await response.json();
               errorMessage = errorData.error || errorMessage;
             } catch (e) {
-              // If the response is not valid JSON, use the default error message
             }
           }
 

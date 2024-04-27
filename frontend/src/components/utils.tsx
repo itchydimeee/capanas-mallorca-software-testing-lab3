@@ -1,6 +1,5 @@
 import { User } from '@auth0/auth0-react';
 
-// Define the interface for your User model
 export interface DatabaseUser {
   id: number;
   auth0_id: string;
@@ -11,7 +10,6 @@ export interface DatabaseUser {
 
 export const fetchUserFromDatabase = async (auth0Id: string): Promise<DatabaseUser | null> => {
   try {
-    // Fetch the user data from your database
     const response = await fetch(`http://localhost:3000/users/${auth0Id}`);
     if (!response.ok) {
       return null;
@@ -38,7 +36,6 @@ export const createUserInDatabase = async (
       return updatedUser;
     }
 
-    // Create a new user in your database
     const response = await fetch('http://localhost:3000/users', {
       method: 'POST',
       headers: {
@@ -71,7 +68,6 @@ export const updateUserInDatabase = async (
   updatedData: Partial<DatabaseUser>
 ): Promise<DatabaseUser> => {
   try {
-    // Update the user data in your database
     const response = await fetch(`http://localhost:3000/users/${auth0Id}`, {
       method: 'PUT',
       headers: {

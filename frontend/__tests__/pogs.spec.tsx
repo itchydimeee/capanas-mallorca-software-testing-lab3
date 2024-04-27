@@ -7,14 +7,13 @@ import { useAuth0 } from '@auth0/auth0-react';
 import PogsForm from '../src/screens/pogs';
 
 
-// Mocking useAuth0 and useNavigation hooks
 jest.mock('@auth0/auth0-react', () => ({
     useAuth0: jest.fn(() => ({ logout: jest.fn() })),
   }));
 
 jest.mock('../src/components/navigation', () => ({
-    __esModule: true, // Add this line
-    default: jest.fn(() => ({ // Add this line
+    __esModule: true,
+    default: jest.fn(() => ({ 
       ToReadPogs: jest.fn(),
       ToUserPage: jest.fn(),
     })),
@@ -22,7 +21,6 @@ jest.mock('../src/components/navigation', () => ({
 
 describe('PogsForm Component', () => {
  beforeEach(() => {
-    // Reset all mocks before each test
     jest.clearAllMocks();
  });
 
@@ -41,7 +39,6 @@ describe('PogsForm Component', () => {
  });
 
  it('handles form submission', async () => {
-    // Mock fetch to simulate API call
     global.fetch = jest.fn().mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve({ message: 'submission successful' }),
@@ -53,7 +50,6 @@ describe('PogsForm Component', () => {
       </BrowserRouter>
     );
 
-    // Fill out the form
     fireEvent.change(screen.getByLabelText('Name:'), { target: { value: 'Test Pog' } });
     fireEvent.change(screen.getByLabelText('Ticker Symbol:'), { target: { value: 'TPG' } });
     fireEvent.change(screen.getByLabelText('Price:'), { target: { value: '10' } });
@@ -63,12 +59,10 @@ describe('PogsForm Component', () => {
 
   fireEvent.click(screen.getByText('Submit'));
 
-  // Wait for the alert to appear
   await waitFor(() => expect(window.alert).toHaveBeenCalledWith('submission successful'));
  });
 
  it('handles logout', async () => {
-    // Define mockLogout in the scope of this test
     const mockLogout = jest.fn();
     (useAuth0 as jest.Mock).mockReturnValue({
         logout: mockLogout,
@@ -81,8 +75,6 @@ describe('PogsForm Component', () => {
     );
 
     fireEvent.click(screen.getByText('Logout'));
-
-    // Wait for the logout function to be called
     await waitFor(() => expect(mockLogout).toHaveBeenCalled());
  });
 });
