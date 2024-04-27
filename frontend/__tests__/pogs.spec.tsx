@@ -41,7 +41,7 @@ describe('PogsForm Component', () => {
  it('handles form submission', async () => {
     global.fetch = jest.fn().mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve({ message: 'submission successful' }),
+      json: () => Promise.resolve({ message: 'Submission successful' }),
     });
 
     render(
@@ -59,7 +59,7 @@ describe('PogsForm Component', () => {
 
   fireEvent.click(screen.getByText('Submit'));
 
-  await waitFor(() => expect(window.alert).toHaveBeenCalledWith('submission successful'));
+  await waitFor(() => expect(window.alert).toHaveBeenCalledWith('Submission successful'));
  });
 
  it('handles logout', async () => {
